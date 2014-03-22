@@ -179,7 +179,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   			for (int k = 0; k < statuses.size(); k++){
 	   				String str1 = termsList.get(j).getTerm();
 	   				String str2 = likes.get(0);
-	   				
+	   				// hi!
 	   				if(str2.toLowerCase().contains(str1.toLowerCase())){
 	   					ctr++;
 	   				}	   					
