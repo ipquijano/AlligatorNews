@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
 	Button logout;
 	Button showWeight;
 	List<String> statusList;
+	List<String> likeList;
 	
 	private Facebook facebookClient;
 	
@@ -49,6 +50,7 @@ public class MainActivity extends Activity {
 		showWeight = (Button) findViewById(R.id.btnShowWeight);
 		facebookClient = new Facebook("1375915182646108");
 		statusList = new ArrayList<String>();
+		likeList = new ArrayList<String>();
 		
 		showWeight.setEnabled(false);
 		
@@ -86,9 +88,9 @@ public class MainActivity extends Activity {
 
 			        List<String> permissions = new ArrayList<String>();
 //			        permissions.add("publish_stream");
-//			        permissions.add("user_likes");
 //			        permissions.add("email");
 //			        permissions.add("user_birthday");
+			        permissions.add("user_likes");
 			        permissions.add("user_status");
 			        op.setPermissions(permissions);
 
@@ -129,7 +131,10 @@ public class MainActivity extends Activity {
 				List<Term> allTerm = new ArrayList<Term>();
 				
 				List<String> allLikes = new ArrayList<String>();
-				allLikes.add("health");
+				//allLikes.add("health");
+				for ( int i = 0; i < likeList.size(); i++ ) {
+					allLikes.add(likeList.get(i));
+				}
 
 				// TODO Redo Tokenizer.computeWeight to not have to call other objects, just the ones needed.
 				// TODO 2 Do not user Tokenizer class anymore	
@@ -140,11 +145,37 @@ public class MainActivity extends Activity {
 		// Convert String from FB Response to com.sptest.Status
 
 	}
+	private void getLikesRequest(final Session session) {	
+		Request request = new Request(
+							session, 
+							"me/likes",
+							null,
+							HttpMethod.GET,
+							new Request.Callback() {
+								@Override
+								public void onCompleted(Response response) {
+									// TODO Handle response data (JSON)
+									try {
+										for ( int i = 0; session == Session.getActiveSession(); i++ ) {
+											likeList.add(response.toString());
+											Log.i("Like " + i, "Added like: " + response.toString());
+										}
+									} catch (Exception e) {
+										e.printStackTrace();
+//										Log.i("MESSAGE", session.getAccessToken());
+//										Log.i("MESSAGE", response.toString());
+//										Log.i("MESSAGE", session.getExpirationDate().toString());
+									}
+								}
+							});
+		request.executeAsync();
+	}
+
 
 	private void getStatusRequest(final Session session) {
 		
 		Bundle params = new Bundle();
-		params.putInt("limit", 20);
+		params.putInt("limit", 100);
 		
 		Request request = new Request(
 							session, 
