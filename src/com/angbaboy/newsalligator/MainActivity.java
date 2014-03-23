@@ -132,32 +132,31 @@ public class MainActivity extends Activity {
 				List<Term> allTerm = new ArrayList<Term>();
 				
 				List<String> allLikes = new ArrayList<String>();
-				//allLikes.add("health");
 				for ( int i = 0; i < likeList.size(); i++ ) {
 					allLikes.add(likeList.get(i));
 				}
 
-				// TODO Redo Tokenizer.computeWeight to not have to call other objects, just the ones needed.
-				// TODO 2 Do not user Tokenizer class anymore	
 				Tokenizer.computeTermWeight(allStatus, allTerm, allLikes);
-
 			}
 		});
-		// Convert String from FB Response to com.sptest.Status
 
 	}
-	private void getLikesRequest(final Session session) {	
+	private void getLikesRequest(final Session session) {
+		
+		Bundle params = new Bundle();
+		params.putInt("limit", 300);
+		
 		Request request = new Request(
 							session, 
 							"me/likes",
-							null,
+							params,
 							HttpMethod.GET,
 							new Request.Callback() {
 								@Override
 								public void onCompleted(Response response) {
 									// TODO Handle response data (JSON)
 									try {
-										GraphObject go  = response.getGraphObject(); // returns NULL, why :(
+										GraphObject go  = response.getGraphObject(); 
 										
 								        JSONObject jso = go.getInnerJSONObject();
 								        JSONArray data = jso.getJSONArray("data");
@@ -168,10 +167,8 @@ public class MainActivity extends Activity {
 										}
 									} catch (Exception e) {
 										e.printStackTrace();
-//										Log.i("MESSAGE", session.getAccessToken());
-//										Log.i("MESSAGE", response.toString());
-//										Log.i("MESSAGE", session.getExpirationDate().toString());
 									}
+									showWeight.setEnabled(true);
 								}
 							});
 		request.executeAsync();
@@ -203,12 +200,13 @@ public class MainActivity extends Activity {
 											Log.i("Status " + i, "Added status: " + dataObject.getString("message"));
 										}
 									} catch (Exception e) {
-//										e.printStackTrace();
-										Log.i("MESSAGE", session.getAccessToken());
-										Log.i("MESSAGE", response.toString());
-										Log.i("MESSAGE", session.getExpirationDate().toString());
+										e.printStackTrace();
+//										Log.i("MESSAGE", session.getAccessToken());
+//										Log.i("MESSAGE", response.toString());
+//										Log.i("MESSAGE", session.getExpirationDate().toString());
 									}
-									showWeight.setEnabled(true);
+//									getLikesRequest(session);
+//									showWeight.setEnabled(true);
 								}
 							});
 		

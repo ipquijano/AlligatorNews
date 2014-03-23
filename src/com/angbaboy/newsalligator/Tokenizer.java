@@ -20,7 +20,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 
 		List<String> likeList = new ArrayList<String>();
 		List<Status> statusList = new ArrayList<Status>();
-		List<Term> terms = new ArrayList<Term>(); 
+		List<Term> termList = new ArrayList<Term>(); 
 		//Used to put all terms in one list; terms are currently saved per status
 		
 		statusList_fileHandling(statusListInput, statusList);
@@ -28,8 +28,8 @@ public class Tokenizer { // Inverse Average Fragment Length
 		//printLikes(likes);
 		//printStats(statuses);
 		//printTerms(terms);
-		computeTermWeight(statusList, terms, likeList);
-		//printTerms(statuses, terms);
+		computeTermWeight(statusList, termList, likeList);
+		printTerms(termList);
 	}
 	
 	public static void printStats(List<Status> statusList){
@@ -44,21 +44,16 @@ public class Tokenizer { // Inverse Average Fragment Length
 		}
 	}
 	
-	public static void printTerms(List<Status> statusList, List<Term> termList){
-		
-		for (int i = 0; i< statusList.size(); i++){
-			for(int j=0; j< statusList.get(i).getTerms().size(); j++){
-				termList = statusList.get(i).getTerms();
-			}
-	   		System.out.println(termList.size());
-	   	 }
-		/*SIGE UG CHANGE ANG TERMS PER STATUS TERMS
-		 * DILI MASAVE TANANG TERMS SA STATUSES
-		 * I.save all terms
-		 * EXCEPT NULL CHARACTERS
-		 * TERMS ALREADY IN LIST*/
-		
-		//System.out.println(terms.size());
+	public static void printTerms(List<Term> termList){
+		System.out.println(termList.size());
+		System.out.println(termList.size());
+		System.out.println(termList.size());
+		System.out.println(termList.size());
+		System.out.println("PRINTING TERMS IN A BIT");
+		System.out.println("PRINTING TERMS IN A BIT");
+		System.out.println("PRINTING TERMS IN A BIT");
+		System.out.println("PRINTING TERMS IN A BIT");
+
 
 		Collections.sort(termList, new Comparator<Term>() {
 			@Override
@@ -69,7 +64,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 		
 		System.out.println(termList.size());
 		for (int i = 0; i < termList.size(); i++){
-			System.out.println(termList.get(i).getRecency() + " | " + termList.get(i).getTerm());
+			System.out.println(termList.get(i).getTotalWeight() + " | " + termList.get(i).getTerm());
 		}
 	}
 	
@@ -115,8 +110,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 			System.out.println("File Read Error");
 		}
 	}
-	
-	
+		
 	
 	/**
 	 * Inverse average fragment length
@@ -176,14 +170,14 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   		 for( int j = 0; j < termsList.size(); j++ ) {
 	   			 int ctr = 0;
 	   			 
-	   			for (int k = 0; k < statuses.size(); k++){
-	   				String str1 = termsList.get(j).getTerm();
-	   				String str2 = likes.get(0);
-	   				// hi!
-	   				if(str2.toLowerCase().contains(str1.toLowerCase())){
-	   					ctr++;
-	   				}	   					
-	   			}
+	   			 for (int k = 0; k < likes.size(); k++){
+	   				 String str1 = termsList.get(j).getTerm();
+	   				 String str2 = likes.get(k);
+	   				 // hi!
+	   				 if(str2.toLowerCase().contains(str1.toLowerCase())){
+	   					 ctr++;
+	   				 }
+	   			 }
 	   			
 	   			if(ctr == 0){
 	   				termsList.get(j).setDocProbability(.005f);	
@@ -234,15 +228,20 @@ public class Tokenizer { // Inverse Average Fragment Length
 	public static void computeTermWeight(List<Status> statusList, List<Term> termList, List<String> likeList){
 		computeIC(statusList, likeList);
 		rankRecency(statusList);
+		int allTermCTR = 0; 
 		
 		for (int i = 0; i< statusList.size(); i++){
-	   		 List<Term> termsList = statusList.get(i).getTerms();
-	   		 for( int j = 0; j < termsList.size(); j++ ) {
-	   			termsList.get(j).setTotalWeight(termsList.get(j).getIcCount() * termsList.get(j).getRecency());
-	   			if(termsList.get(j).getTerm().length() > 2)
-	   				System.out.println(termsList.get(j).getTotalWeight() + " - " + termsList.get(j).getTerm());
+	   		 List<Term> statusTerms = statusList.get(i).getTerms();
+	   		 for( int j = 0; j < statusTerms.size(); j++ ) {
+	   			statusTerms.get(j).setTotalWeight(statusTerms.get(j).getIcCount() * statusTerms.get(j).getRecency());
+	   			if(statusTerms.get(j).getTerm().length() > 2)
+	   				termList.add(statusTerms.get(j));
+	   				//System.out.println(statusTerms.get(j).getTotalWeight() + " - " + statusTerms.get(j).getTerm());
 	   		 }
 	   	 }
+		
+		printTerms(termList);
+
 	}
 	
 
