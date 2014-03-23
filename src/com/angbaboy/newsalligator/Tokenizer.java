@@ -240,7 +240,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   		 for( int j = 0; j < termsList.size(); j++ ) {
 	   			termsList.get(j).setTotalWeight(termsList.get(j).getIcCount() * termsList.get(j).getRecency());
 	   			if(termsList.get(j).getTerm().length() > 2)
-	   				System.out.println(termsList.get(j).getTotalWeight());
+	   				System.out.println(termsList.get(j).getTotalWeight() + " - " + termsList.get(j).getTerm());
 	   		 }
 	   	 }
 	}

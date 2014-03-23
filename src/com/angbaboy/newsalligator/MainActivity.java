@@ -157,9 +157,14 @@ public class MainActivity extends Activity {
 								public void onCompleted(Response response) {
 									// TODO Handle response data (JSON)
 									try {
-										for ( int i = 0; session == Session.getActiveSession(); i++ ) {
-											likeList.add(response.toString());
-											Log.i("Like " + i, "Added like: " + response.toString());
+										GraphObject go  = response.getGraphObject(); // returns NULL, why :(
+										
+								        JSONObject jso = go.getInnerJSONObject();
+								        JSONArray data = jso.getJSONArray("data");
+								        for ( int i = 0; session == Session.getActiveSession(); i++ ) {
+											JSONObject dataObject = data.getJSONObject(i);
+											likeList.add(dataObject.getString("name"));
+											Log.i("Like " + i, "Added like: " + dataObject.getString("name"));
 										}
 									} catch (Exception e) {
 										e.printStackTrace();
