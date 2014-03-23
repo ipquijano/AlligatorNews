@@ -78,6 +78,7 @@ public class MainActivity extends Activity {
 				
 				if (currentSession.isOpened()) {
 					getStatusRequest(currentSession);
+					getLikesRequest(currentSession);
 //					new StatusCallAsync().execute(currentSession);
 				} else if ( !currentSession.isOpened() ) {
 					// Ask for username and password
