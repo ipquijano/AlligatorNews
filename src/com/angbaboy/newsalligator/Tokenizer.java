@@ -225,7 +225,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   	 }
 	}
 	
-	public static void computeTermWeight(List<Status> statusList, List<Term> termList, List<String> likeList){
+	public static List<Term> computeTermWeight(List<Status> statusList, List<Term> termList, List<String> likeList){
 		computeIC(statusList, likeList);
 		rankRecency(statusList);
 		int allTermCTR = 0; 
@@ -241,6 +241,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   	 }
 		
 		printTerms(termList);
+		return termList;
 
 	}
 	

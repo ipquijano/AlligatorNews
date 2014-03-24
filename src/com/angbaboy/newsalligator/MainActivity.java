@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,8 +36,10 @@ public class MainActivity extends Activity {
 	Button getStatus;
 	Button logout;
 	Button showWeight;
+	Button showNews;
 	List<String> statusList;
 	List<String> likeList;
+	String topTerms;
 	
 	private Facebook facebookClient;
 	
@@ -48,11 +51,13 @@ public class MainActivity extends Activity {
 		getStatus = (Button) findViewById(R.id.btnGetStatus);
 		logout = (Button) findViewById(R.id.logout);
 		showWeight = (Button) findViewById(R.id.btnShowWeight);
+		showNews = (Button) findViewById(R.id.btnShowNews);
 		facebookClient = new Facebook("1375915182646108");
 		statusList = new ArrayList<String>();
 		likeList = new ArrayList<String>();
 		
 		showWeight.setEnabled(false);
+		showNews.setEnabled(false);
 		
 		logout.setOnClickListener(new OnClickListener() {
 			@Override
@@ -136,84 +141,35 @@ public class MainActivity extends Activity {
 					allLikes.add(likeList.get(i));
 				}
 
-				Tokenizer.computeTermWeight(allStatus, allTerm, allLikes);
+				allTerm = Tokenizer.computeTermWeight(allStatus, allTerm, allLikes);
+				
+				TextView weightedResults = (TextView) findViewById(R.id.weightedResults);
+				topTerms = "";
+				for ( int i = 0; i < 20; i++ ) {
+//					weightedResults.setText("Top Interests: " + allTerm.get(i).getTerm() + "!");
+					topTerms = topTerms + allTerm.get(i).getTerm() + ", ";
+				}
+				weightedResults.setText("Top Interests: " + topTerms + "!");
+				showNews.setEnabled(true);
+			}
+		});
+		
+		showNews.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// add to SharedPreferences Cache
+				SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+				editor.putString("topterms", topTerms);
+				editor.commit();
+				
+				Intent myIntent = new Intent();
+				myIntent.setClassName("com.angbaboy.newsalligator", "com.simplerssreader.MainRssActivity");
+				startActivity(myIntent);
+//				finish();
 			}
 		});
 
 	}
-	private void getLikesRequest(final Session session) {
-		
-		Bundle params = new Bundle();
-		params.putInt("limit", 300);
-		
-		Request request = new Request(
-							session, 
-							"me/likes",
-							params,
-							HttpMethod.GET,
-							new Request.Callback() {
-								@Override
-								public void onCompleted(Response response) {
-									// TODO Handle response data (JSON)
-									try {
-										GraphObject go  = response.getGraphObject(); 
-										
-								        JSONObject jso = go.getInnerJSONObject();
-								        JSONArray data = jso.getJSONArray("data");
-								        for ( int i = 0; session == Session.getActiveSession(); i++ ) {
-											JSONObject dataObject = data.getJSONObject(i);
-											likeList.add(dataObject.getString("name"));
-											Log.i("Like " + i, "Added like: " + dataObject.getString("name"));
-										}
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-									showWeight.setEnabled(true);
-								}
-							});
-		request.executeAsync();
-	}
-
-
-	private void getStatusRequest(final Session session) {
-		
-		Bundle params = new Bundle();
-		params.putInt("limit", 100);
-		
-		Request request = new Request(
-							session, 
-							"/me/statuses",
-							params,
-							HttpMethod.GET,
-							new Request.Callback() {
-								@Override
-								public void onCompleted(Response response) {
-									// TODO Handle response data (JSON)
-									try {
-										GraphObject go  = response.getGraphObject(); // returns NULL, why :(
-										
-								        JSONObject jso = go.getInnerJSONObject();
-								        JSONArray data = jso.getJSONArray("data");
-										for ( int i = 0; i < data.length(); i++ ) {
-											JSONObject dataObject = data.getJSONObject(i);
-											statusList.add(dataObject.getString("message"));
-											Log.i("Status " + i, "Added status: " + dataObject.getString("message"));
-										}
-									} catch (Exception e) {
-										e.printStackTrace();
-//										Log.i("MESSAGE", session.getAccessToken());
-//										Log.i("MESSAGE", response.toString());
-//										Log.i("MESSAGE", session.getExpirationDate().toString());
-									}
-//									getLikesRequest(session);
-//									showWeight.setEnabled(true);
-								}
-							});
-		
-		request.executeAsync();
-		
-	}
-	
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -250,5 +206,80 @@ public class MainActivity extends Activity {
 			});
 		}
 	}
+	
+	
+	private void getLikesRequest(final Session session) {
+		
+		Bundle params = new Bundle();
+		params.putInt("limit", 30);
+		
+		Request request = new Request(
+							session, 
+							"me/likes",
+							params,
+							HttpMethod.GET,
+							new Request.Callback() {
+								@Override
+								public void onCompleted(Response response) {
+									// TODO Handle response data (JSON)
+									try {
+										GraphObject go  = response.getGraphObject(); 
+										
+								        JSONObject jso = go.getInnerJSONObject();
+								        JSONArray data = jso.getJSONArray("data");
+								        for ( int i = 0; session == Session.getActiveSession(); i++ ) {
+											JSONObject dataObject = data.getJSONObject(i);
+											likeList.add(dataObject.getString("name"));
+											Log.i("Like " + i, "Added like: " + dataObject.getString("name"));
+										}
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+									showWeight.setEnabled(true);
+								}
+							});
+		request.executeAsync();
+	}
+
+
+	private void getStatusRequest(final Session session) {
+		
+		Bundle params = new Bundle();
+		params.putInt("limit", 10);
+		
+		Request request = new Request(
+							session, 
+							"/me/statuses",
+							params,
+							HttpMethod.GET,
+							new Request.Callback() {
+								@Override
+								public void onCompleted(Response response) {
+									// TODO Handle response data (JSON)
+									try {
+										GraphObject go  = response.getGraphObject(); // returns NULL, why :(
+										
+								        JSONObject jso = go.getInnerJSONObject();
+								        JSONArray data = jso.getJSONArray("data");
+										for ( int i = 0; i < data.length(); i++ ) {
+											JSONObject dataObject = data.getJSONObject(i);
+											statusList.add(dataObject.getString("message"));
+											Log.i("Status " + i, "Added status: " + dataObject.getString("message"));
+										}
+									} catch (Exception e) {
+										e.printStackTrace();
+//										Log.i("MESSAGE", session.getAccessToken());
+//										Log.i("MESSAGE", response.toString());
+//										Log.i("MESSAGE", session.getExpirationDate().toString());
+									}
+//									getLikesRequest(session);
+//									showWeight.setEnabled(true);
+								}
+							});
+		
+		request.executeAsync();
+		
+	}
+	
 	
 }
