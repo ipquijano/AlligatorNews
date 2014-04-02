@@ -29,7 +29,8 @@ public class PcWorldRssParser extends Activity {
 			inputStream.close();
 		}
 	}
-
+	
+	//Feed Search and Retrieval
 	private List<RssItem> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
 		parser.require(XmlPullParser.START_TAG, null, "rss");
 		String title = null;
@@ -49,17 +50,11 @@ public class PcWorldRssParser extends Activity {
 				link = readLink(parser);
 			}
 			if (title != null && link != null) {
-//				for ( String topTerm : allTopTerms ) {
-//					if ( title.contains(topTerm) ) {
 						Log.i("TITLE", title);
 						RssItem item = new RssItem(title, link);
 						items.add(item);
 						title = null;
 						link = null;
-//						break;
-						
-//					}
-//				}
 			}
 		}
 		return items;

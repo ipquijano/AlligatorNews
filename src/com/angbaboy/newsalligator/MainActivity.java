@@ -154,6 +154,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		//Adds our keywords to our RSS' News Article Search 
 		showNews.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -164,8 +165,8 @@ public class MainActivity extends Activity {
 				
 				Intent myIntent = new Intent();
 				myIntent.setClassName("com.angbaboy.newsalligator", "com.simplerssreader.MainRssActivity");
+				
 				startActivity(myIntent);
-//				finish();
 			}
 		});
 
@@ -211,7 +212,7 @@ public class MainActivity extends Activity {
 	private void getLikesRequest(final Session session) {
 		
 		Bundle params = new Bundle();
-		params.putInt("limit", 30);
+		params.putInt("limit", 100);
 		
 		Request request = new Request(
 							session, 
@@ -245,7 +246,7 @@ public class MainActivity extends Activity {
 	private void getStatusRequest(final Session session) {
 		
 		Bundle params = new Bundle();
-		params.putInt("limit", 10);
+		params.putInt("limit", 100);
 		
 		Request request = new Request(
 							session, 
@@ -268,12 +269,7 @@ public class MainActivity extends Activity {
 										}
 									} catch (Exception e) {
 										e.printStackTrace();
-//										Log.i("MESSAGE", session.getAccessToken());
-//										Log.i("MESSAGE", response.toString());
-//										Log.i("MESSAGE", session.getExpirationDate().toString());
 									}
-//									getLikesRequest(session);
-//									showWeight.setEnabled(true);
 								}
 							});
 		

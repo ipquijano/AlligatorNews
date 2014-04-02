@@ -21,13 +21,9 @@ public class Tokenizer { // Inverse Average Fragment Length
 		List<String> likeList = new ArrayList<String>();
 		List<Status> statusList = new ArrayList<Status>();
 		List<Term> termList = new ArrayList<Term>(); 
-		//Used to put all terms in one list; terms are currently saved per status
 		
 		statusList_fileHandling(statusListInput, statusList);
 		likeList_fileHandling(likeListInput, likeList);
-		//printLikes(likes);
-		//printStats(statuses);
-		//printTerms(terms);
 		computeTermWeight(statusList, termList, likeList);
 		printTerms(termList);
 	}
@@ -45,16 +41,7 @@ public class Tokenizer { // Inverse Average Fragment Length
 	}
 	
 	public static void printTerms(List<Term> termList){
-		System.out.println(termList.size());
-		System.out.println(termList.size());
-		System.out.println(termList.size());
-		System.out.println(termList.size());
-		System.out.println("PRINTING TERMS IN A BIT");
-		System.out.println("PRINTING TERMS IN A BIT");
-		System.out.println("PRINTING TERMS IN A BIT");
-		System.out.println("PRINTING TERMS IN A BIT");
-
-
+	
 		Collections.sort(termList, new Comparator<Term>() {
 			@Override
 			public int compare(Term o1, Term o2) {
@@ -86,7 +73,8 @@ public class Tokenizer { // Inverse Average Fragment Length
 			String str;
 			int count = 0;
 			str = new String();
-
+			
+			//Parsing a Status Message Using Stop Words and Stop Characters
 			while ((str = in.readLine()) != null) {
 				List<Term> thisToken = new ArrayList<Term>();
 				
@@ -95,9 +83,8 @@ public class Tokenizer { // Inverse Average Fragment Length
 				String[] tokens = str.split("[!,.?:; ]|and|or");
 				
 				for (int i = 0; i < tokens.length; i++){
-					Term term = new Term(tokens[i].trim(), 0,  0,  0,  0, i,  0 ); // added .trim() to tokens[]
+					Term term = new Term(tokens[i].trim(), 0,  0,  0,  0, i,  0 );
 					tokens[i] = tokens[i].trim();
-					//System.out.println("term at " + i + " = " + term.getTerm());
 					status.getTerms().add(term);
 				}
 
@@ -123,8 +110,6 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   		 List<Term> termsList = statuses.get(i).getTerms();
 	   		 for( int j = 0; j < termsList.size(); j++ ) {
 	   			termsList.get(j).setFragLength((float) 1/ ((((float) 1)/termsList.size()) * termsList.get(j).getTerm().length()));
-	   			//System.out.println(termsList.size() + " | " + termsList.get(j).getTerm().length());
-	   			//System.out.println(termsList.get(j).getTerm() + " | " + termsList.get(j).getFragLength());
 	   		 }
 	   	 }
 	}
@@ -153,7 +138,6 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   			}
 	   			
 	   			termsList.get(j).setCatProbability(((float) statuses.get(i).getTerms().size()) / (float) ctr);
-	   			//System.out.println(termsList.get(j).getCatProbability() + " | " + termsList.get(j).getTerm());
 	   		 }
 	   	 }
 	   }
@@ -173,7 +157,6 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   			 for (int k = 0; k < likes.size(); k++){
 	   				 String str1 = termsList.get(j).getTerm();
 	   				 String str2 = likes.get(k);
-	   				 // hi!
 	   				 if(str2.toLowerCase().contains(str1.toLowerCase())){
 	   					 ctr++;
 	   				 }
@@ -185,7 +168,6 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   				termsList.get(j).setDocProbability(((float)1)/ ctr);	
 	   			}
 	   			
-	   			//System.out.println(termsList.get(j).getDocProbability() + " | " + termsList.get(j).getTerm());
 	   		 }
 	   	 }
 	}
@@ -234,13 +216,28 @@ public class Tokenizer { // Inverse Average Fragment Length
 	   		 List<Term> statusTerms = statusList.get(i).getTerms();
 	   		 for( int j = 0; j < statusTerms.size(); j++ ) {
 	   			statusTerms.get(j).setTotalWeight(statusTerms.get(j).getIcCount() * statusTerms.get(j).getRecency());
-	   			if(statusTerms.get(j).getTerm().length() > 2)
-	   				termList.add(statusTerms.get(j));
-	   				//System.out.println(statusTerms.get(j).getTotalWeight() + " - " + statusTerms.get(j).getTerm());
+   				System.out.println("LOOP " + j);
+   				if (statusTerms.get(j).getTerm().length() > 3 && statusTerms.get(j).getTerm().length() != 0)
+	   		 		termList.add(statusTerms.get(j));
 	   		 }
+	   		 
+	   		Collections.sort(statusTerms, new Comparator<Term>() {
+				@Override
+				public int compare(Term o1, Term o2) {
+					return Float.valueOf(o2.totalWeight).compareTo(o1.totalWeight);
+				}  
+			 });
+	   		
 	   	 }
 		
-		printTerms(termList);
+		
+		Collections.sort(termList, new Comparator<Term>() {
+			@Override
+			public int compare(Term o1, Term o2) {
+				return Float.valueOf(o1.totalWeight).compareTo(o2.totalWeight);
+			}  
+		 });
+		
 		return termList;
 
 	}
